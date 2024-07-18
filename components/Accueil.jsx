@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
-import { fetchProduits } from '../api/api';
+import { fetchProduits } from '../api/productApi';
 
 function ProduitsScreen() {
   const [produits, setProduits] = useState([]);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, Button, Text, TouchableOpacity } from 'react-native';
-import { register } from '../api/api'; // Chemin vers votre fichier api.js
+import { register } from '../api/productApi'; // Chemin vers votre fichier api.js
 import { useNavigation } from '@react-navigation/native';
 
 const RegisterForm = () => {
