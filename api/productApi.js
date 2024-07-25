@@ -13,7 +13,7 @@ async function fetchProduits() {
 
   async function fetchProduit(productId) {
     try {
-      const response = await fetch(`${API_BASE_URL}/produit/${productId}`);
+      const response = await fetch(`${API_BASE_URL}/api/produit/${productId}`);
       const data = await response.json();
   
       if (response.ok) {

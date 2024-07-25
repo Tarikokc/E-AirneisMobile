@@ -9,7 +9,7 @@ import {
     Dimensions
 } from 'react-native';
 import { useRoute } from '@react-navigation/native';
-import { getProduct } from '../api/api';
+import { fetchProduit } from '../api/productApi';
 
 const baseUrl = '/img/'; 
 const {width} = Dimensions.get('window');
@@ -25,7 +25,7 @@ const ProductSingle = () => {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const productData = await getProduct(productId);
+        const productData = await fetchProduct(productId);
         setProduct(productData);
         setSimilarProducts(productData.similarProducts || []); // Handle the case where similarProducts is not present
       } catch (err) {
