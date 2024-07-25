@@ -8,7 +8,7 @@ import {
     TouchableOpacity, 
     Dimensions
 } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+// import { useRoute } from '@react-navigation/native';
 import { fetchProduit } from '../api/productApi';
 
 const baseUrl = '/img/'; 
@@ -25,7 +25,7 @@ const ProductSingle = () => {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const productData = await fetchProduct(productId);
+        const productData = await fetchProduit(productId);
         setProduct(productData);
         setSimilarProducts(productData.similarProducts || []); // Handle the case where similarProducts is not present
       } catch (err) {

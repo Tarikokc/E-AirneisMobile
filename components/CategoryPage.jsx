@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Image, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { useRoute } from '@react-navigation/native'; 
-import { getCategory, getCategoryProducts } from '../api/productApi';
+// import { useRoute } from '@react-navigation/native'; 
+import { fetchCategory, fetchCategoryProducts } from '../api/categoriesApi';
 
 const baseUrl = '/img/'; 
 
@@ -15,8 +15,8 @@ const CategoryPage = () => {
   useEffect(() => {
     const fetchCategoryData = async () => {
       try {
-        const categoryData = await getCategory(categoryId);
-        const productsData = await getCategoryProducts(categoryId);
+        const categoryData = await fetchCategory(categoryId);
+        const productsData = await fetchCategoryProducts(categoryId);
         setCategory(categoryData);
         setCategoryProducts(productsData);
       } catch (error) {

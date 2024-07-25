@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   StyleSheet, 
   View, 
@@ -10,10 +10,15 @@ import {
   Dimensions,
   Picker, 
   ScrollView,
+  ActivityIndicator,
+  Switch, // Pour le filtre "En stock"
 } from 'react-native';
+// import { useNavigation } from '@react-navigation/native';
+import { searchProducts } from '../api/searchProductApi';
+import { fetchCategories } from '../api/categoriesApi';
 
-const baseUrl = '/img/'; 
-const {width} = Dimensions.get('window'); 
+const baseUrl = '/img/';
+const { width } = Dimensions.get('window');
 
 const RecherchePage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -25,8 +30,43 @@ const RecherchePage = () => {
     enStock: false,
   });
   const [sort, setSort] = useState('prix-asc');
-  const [products, setProducts] = useState([]); // Données de produits (à remplacer par vos données)
-  const [categories, setCategories] = useState([]); // Données de catégories (à remplacer par vos données)
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const categoriesData = await fetchCategories();
+        setCategories(categoriesData);
+        fetchDataProducts(); // Charger les produits initiaux
+      } catch (error) {
+        console.error('Erreur lors de la récupération des catégories:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const fetchDataProducts = async () => {
+    setIsLoading(true);
+    try {
+      const productsData = await searchProducts({
+        search: searchTerm,
+        materiaux: filters.materiaux.length > 0 ? filters.materiaux.join(',') : null,
+        prixMin: filters.prixMin !== '' ? filters.prixMin : null,
+        prixMax: filters.prixMax !== '' ? filters.prixMax : null,
+        categories: filters.categories.length > 0 ? filters.categories.join(',') : null,
+        enStock: filters.enStock,
+        sort,
+      });
+      setProducts(productsData);
+    } catch (error) {
+      console.error('Erreur lors de la recherche de produits :', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSearchChange = (text) => {
     setSearchTerm(text);
@@ -44,15 +84,16 @@ const RecherchePage = () => {
   };
 
   const handleSubmit = () => {
-    // Ici, vous appelleriez votre fonction de recherche pour récupérer les produits
-    // en fonction des critères de recherche et des filtres
-    console.log('Recherche avec les critères :', searchTerm, filters, sort);
+    fetchDataProducts();
   };
 
   const renderProductItem = ({ item }) => (
-    <TouchableOpacity style={styles.productCard}>
-      <Image 
-        source={{ uri: baseUrl + item.productPhotos[0]?.photoUrl }} 
+    <TouchableOpacity
+      style={styles.productCard}
+      onPress={() => navigation.navigate('ProductDetails', { productId: item.productId })}
+    >
+      <Image
+        source={{ uri: baseUrl + item.productPhotos[0]?.photoUrl }}
         style={styles.productImage}
       />
       <View style={styles.productCardDetails}>
@@ -72,10 +113,22 @@ const RecherchePage = () => {
         onChangeText={handleSearchChange}
         onSubmitEditing={handleSubmit}
       />
-      {/* Filtres (dans un ScrollView pour les rendre défilants) */}
+    
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={styles.filters}>
-          {/* ... Vos composants de filtre ici (Picker, CheckBox, etc.) */}
+          {/* Filtres */}
+          {/* ... (Composants de filtre pour les matériaux, le prix, etc.) */}
+
+          {/* Filtre "En stock" */}
+          <View style={styles.filterItem}>
+            <Text>En stock uniquement :</Text>
+            <Switch
+              value={filters.enStock}
+              onValueChange={(value) => handleFilterChange('enStock', value)}
+            />
+          </View>
+
+          {/* Tri */}
           <Picker
             selectedValue={sort}
             onValueChange={handleSortChange}
@@ -87,21 +140,26 @@ const RecherchePage = () => {
           </Picker>
         </View>
       </ScrollView>
-      <FlatList
-        data={products}
-        renderItem={renderProductItem}
-        keyExtractor={(item) => item.productId.toString()}
-        numColumns={2}
-        contentContainerStyle={styles.productGrid}
-        ListEmptyComponent={<Text>Aucun produit ne correspond à votre recherche.</Text>}
-      />
+
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <FlatList
+          data={products}
+          renderItem={renderProductItem}
+          keyExtractor={(item) => item.productId.toString()}
+          numColumns={2}
+          contentContainerStyle={styles.productGrid}
+          ListEmptyComponent={<Text>Aucun produit ne correspond à votre recherche.</Text>}
+        />
+      )}
     </View>
   );
 };
 
-// // Styles (à personnaliser selon vos besoins)
-// const styles = StyleSheet.create({
-//   // ... styles pour container, searchInput, filters, productCard, etc.
-// });
+// Styles
+const styles = StyleSheet.create({
+  // ... (styles pour le container, searchInput, filters, productCard, etc.)
+});
 
 export default RecherchePage;

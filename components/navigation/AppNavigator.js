@@ -13,8 +13,8 @@ const Stack = createNativeStackNavigator();
 export default function AppNavigator() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="LoginForm" component={LoginForm} />
-      <Stack.Screen name="RegisterForm" component={RegisterForm} />
+      {/* <Stack.Screen name="LoginForm" component={LoginForm} />
+      <Stack.Screen name="RegisterForm" component={RegisterForm} /> */}
       <Stack.Screen name="Accueil" component={Accueil} />
       <Stack.Screen name="CategoryPage" component={CategoryPage} />
       <Stack.Screen name="ProductSingle" component={ProductSingle} />
